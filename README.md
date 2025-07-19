@@ -12,6 +12,7 @@ HackPack is a minimal, scalable, and lightning-fast boilerplate designed for rap
 - 🗂️ Scalable project structure with path aliases
 - ⚡ Minimal, clean, and fast — made for hackathons
 - 🎭 **React 19** with latest features
+- 📊 **React Icons** library with popular icon sets
 
 ---
 
@@ -27,6 +28,7 @@ HackPack is a minimal, scalable, and lightning-fast boilerplate designed for rap
 | Prisma         | 6.12.0  | Database ORM                    |
 | Clerk          | 6.25.4  | Authentication Provider         |
 | Zod            | 4.0.5   | Schema Validation               |
+| React Icons    | Latest  | Icon Library                    |
 | PostgreSQL     | -       | Database                        |
 
 ---
