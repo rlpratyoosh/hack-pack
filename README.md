@@ -13,6 +13,7 @@ HackPack is a minimal, scalable, and lightning-fast boilerplate designed for rap
 - ⚡ Minimal, clean, and fast — made for hackathons
 - 🎭 **React 19** with latest features
 - 📊 **React Icons** library with popular icon sets
+- 🎞️ **Framer Motion** for smooth animations and micro-interactions
 
 ---
 
@@ -29,6 +30,7 @@ HackPack is a minimal, scalable, and lightning-fast boilerplate designed for rap
 | Clerk          | 6.25.4  | Authentication Provider         |
 | Zod            | 4.0.5   | Schema Validation               |
 | React Icons    | Latest  | Icon Library                    |
+| Framer Motion  | Latest  | Animation Library               |
 | PostgreSQL     | -       | Database                        |
 
 ---
@@ -140,6 +142,12 @@ Clerk authentication is pre-configured in the root layout. The setup includes:
 - Shadcn/UI component library
 - CSS animations with `tw-animate-css`
 
+**Framer Motion** for:
+- Smooth page transitions
+- Component animations
+- Gesture handling
+- Layout animations
+
 ---
 
 ## 🚀 Deployment
@@ -174,6 +182,7 @@ npm run lint     # Run ESLint
 3. **Add server actions** in `src/lib/action.ts`
 4. **Build your pages** in `src/app/`
 5. **Style with TailwindCSS** and Shadcn/UI components
+6. **Add animations** with Framer Motion for better UX
 
 ---
 
@@ -184,6 +193,7 @@ npm run lint     # Run ESLint
 - Keep components modular and reusable
 - Use the `cn()` utility for conditional styling
 - Take advantage of TypeScript for better development experience
+- Add subtle animations with Framer Motion to make your app feel polished
 
 ---
 
