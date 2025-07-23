@@ -14,6 +14,7 @@ HackPack is a minimal, scalable, and lightning-fast boilerplate designed for rap
 - 🎭 **React 19** with latest features
 - 📊 **React Icons** library with popular icon sets
 - 🎞️ **Framer Motion** for smooth animations and micro-interactions
+- 📝 **React Hook Form** with Zod resolvers for powerful form handling
 
 ---
 
@@ -31,6 +32,7 @@ HackPack is a minimal, scalable, and lightning-fast boilerplate designed for rap
 | Zod            | 4.0.5   | Schema Validation               |
 | React Icons    | Latest  | Icon Library                    |
 | Framer Motion  | Latest  | Animation Library               |
+| React Hook Form| Latest  | Form Handling & Validation      |
 | PostgreSQL     | -       | Database                        |
 
 ---
