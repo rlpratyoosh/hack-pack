@@ -8,15 +8,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
   email: z.string().email("Invalid Email Address"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 type FormData = z.infer<typeof schema>;
 
 export default function SignupPage() {
   const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -34,23 +38,12 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    // Check password length
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setLoading(false);
-      return;
-    }
-
     const { error } = await supabase.auth.signUp({
       email: data.email,
-      password,
+      password: data.password,
+      options: {
+        data: {full_name: data.fullName}
+      }
     });
 
     if (error) {
@@ -59,7 +52,7 @@ export default function SignupPage() {
       return;
     } else {
       setLoading(false);
-      router.push("/dashboard");
+      router.push("/login");
     }
   };
 
@@ -68,6 +61,15 @@ export default function SignupPage() {
       <div className="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Sign Up</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="w-full p-3 rounded bg-gray-700 focus:outline-none"
+            {...register("fullName")}
+          />
+          {errors.fullName && (
+            <p className="text-red-400 text-sm">{errors.fullName.message}</p>
+          )}
           <input
             type="email"
             placeholder="Email"
@@ -81,18 +83,20 @@ export default function SignupPage() {
             type="password"
             placeholder="Password"
             className="w-full p-3 rounded bg-gray-700 focus:outline-none"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            {...register("password")}
           />
+          {errors.password && (
+            <p className="text-red-400 text-sm">{errors.password.message}</p>
+          )}
           <input
             type="password"
             placeholder="Confirm Password"
             className="w-full p-3 rounded bg-gray-700 focus:outline-none"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
+            {...register("confirmPassword")}
           />
+          {errors.confirmPassword && (
+            <p className="text-red-400 text-sm">{errors.confirmPassword.message}</p>
+          )}
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             type="submit"
