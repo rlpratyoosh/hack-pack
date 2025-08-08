@@ -13,7 +13,7 @@ export async function middleware(req: NextRequest) {
   const publicRoutes = ["/", "/login", "/signup"];
 
   if (
-    !publicRoutes.some((route) => req.nextUrl.pathname.startsWith(route)) &&
+    !publicRoutes.some((route) => req.nextUrl.pathname === route) &&
     !user
   ) {
     return NextResponse.redirect(new URL("/login", req.url));
