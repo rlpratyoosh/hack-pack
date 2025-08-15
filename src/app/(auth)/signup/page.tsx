@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 
 import { z } from "zod";
@@ -32,35 +31,35 @@ export default function SignupPage() {
     resolver: zodResolver(schema),
   });
 
-  const supabase = createClientComponentClient();
+  // const supabase = createClientComponentClient();
 
-  const onSubmit = async (data: FormData) => {
-    setLoading(true);
-    setError(null);
+  // const onSubmit = async (data: FormData) => {
+  //   setLoading(true);
+  //   setError(null);
 
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {full_name: data.fullName}
-      }
-    });
+  //   const { error } = await supabase.auth.signUp({
+  //     email: data.email,
+  //     password: data.password,
+  //     options: {
+  //       data: {full_name: data.fullName}
+  //     }
+  //   });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    } else {
-      setLoading(false);
-      router.push("/login");
-    }
-  };
+  //   if (error) {
+  //     setError(error.message);
+  //     setLoading(false);
+  //     return;
+  //   } else {
+  //     setLoading(false);
+  //     router.push("/login");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
       <div className="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Sign Up</h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form className="space-y-4">
           <input
             type="text"
             placeholder="Full Name"

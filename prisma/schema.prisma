@@ -10,6 +10,6 @@ datasource db {
 
 model profile {
   id        String @id @default(cuid())
-  fullname  String?
-  avatarurl String?
+  fullName  String?
+  avatarUrl String?
 }
