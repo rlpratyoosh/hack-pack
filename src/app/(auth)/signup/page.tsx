@@ -1,22 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { signUpSchema } from "@/lib/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signUp } from "@/lib/action";
 
-const schema = z.object({
-  fullName: z.string().min(2, "Full Name is required"),
-  email: z.string().email("Invalid Email Address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
-
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<typeof signUpSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,46 +19,40 @@ export default function SignupPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(signUpSchema),
   });
 
-  // const supabase = createClientComponentClient();
 
-  // const onSubmit = async (data: FormData) => {
-  //   setLoading(true);
-  //   setError(null);
-
-  //   const { error } = await supabase.auth.signUp({
-  //     email: data.email,
-  //     password: data.password,
-  //     options: {
-  //       data: {full_name: data.fullName}
-  //     }
-  //   });
-
-  //   if (error) {
-  //     setError(error.message);
-  //     setLoading(false);
-  //     return;
-  //   } else {
-  //     setLoading(false);
-  //     router.push("/login");
-  //   }
-  // };
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await signUp(data);
+      router.push("/login");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
       <div className="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Sign Up</h1>
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <input
             type="text"
-            placeholder="Full Name"
+            placeholder="Username"
             className="w-full p-3 rounded bg-gray-700 focus:outline-none"
-            {...register("fullName")}
+            {...register("userName")}
           />
-          {errors.fullName && (
-            <p className="text-red-400 text-sm">{errors.fullName.message}</p>
+          {errors.userName && (
+            <p className="text-red-400 text-sm">{errors.userName.message}</p>
           )}
           <input
             type="email"

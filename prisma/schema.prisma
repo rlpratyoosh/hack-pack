@@ -8,8 +8,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model profile {
-  id        String @id @default(cuid())
+model User {
+  id                 String              @id @default(cuid())
+  userName           String              @unique
+  email              String              @unique
+  password           String
+  isVerified         Boolean             @default(false)
+  profile            Profile?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  verificationTokens VerificationToken[]
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
   fullName  String?
   avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  token   String   @unique
+  expires DateTime
+  userId  String
+  user    User     @relation(fields: [userId], references: [id])
 }

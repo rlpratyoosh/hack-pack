@@ -4,38 +4,41 @@ HackPack is a minimal, scalable, and lightning-fast boilerplate designed for rap
 
 ## 🚀 Features
 
-- 🔩 **Next.js 15.4** with App Router and TypeScript
-- 🎨 **TailwindCSS v4** + **Shadcn/UI** for modern UI components
-- 🔐 **Supabase Authentication** with login/signup pages and protected routes
-- ⚙️ **Prisma 6.12** ORM with PostgreSQL support
-- 🧠 **Zod v4** schema validation
-- �️ **Middleware-based route protection** for authenticated pages
-- �🗂️ Scalable project structure with path aliases
-- ⚡ Minimal, clean, and fast — made for hackathons
-- 🎭 **React 19** with latest features
-- 📊 **React Icons** library with popular icon sets
-- 🎞️ **Framer Motion** for smooth animations and micro-interactions
-- 📝 **React Hook Form** with Zod resolvers for powerful form handling
-- 🎣 **Custom useAuth hook** for authentication state management
+-   🔩 **Next.js 15.4** with App Router and TypeScript
+-   🎨 **TailwindCSS v4** + **Shadcn/UI** for modern UI components
+-   🔐 **NextAuth v5 Authentication** with credentials provider, login/signup pages and protected routes
+-   ⚙️ **Prisma 6.12** ORM with PostgreSQL support
+-   🧠 **Zod v4** schema validation
+-   �️ **Middleware-based route protection** for authenticated pages
+-   �🗂️ Scalable project structure with path aliases
+-   ⚡ Minimal, clean, and fast — made for hackathons
+-   🎭 **React 19** with latest features
+-   📊 **React Icons** library with popular icon sets
+-   🎞️ **Framer Motion** for smooth animations and micro-interactions
+-   📝 **React Hook Form** with Zod resolvers for powerful form handling
+-   🎣 **Custom useAuth hook** for authentication state management
+-   📧 **Email verification system** with secure token-based verification
 
 ---
 
 ## 📦 Tech Stack
 
-| Tech                    | Version | Purpose                         |
-|-------------------------|---------|----------------------------------|
-| Next.js                 | 15.4.2  | Fullstack React Framework       |
-| React                   | 19.1.0  | UI Library                      |
-| TypeScript              | 5.x     | Type Safety & DX                |
-| TailwindCSS             | 4.1.11  | Styling Framework               |
-| Shadcn/UI               | Latest  | Pre-built Accessible Components |
-| Supabase                | 2.53.0  | Authentication & Backend        |
-| Prisma                  | 6.12.0  | Database ORM                    |
-| Zod                     | 4.0.5   | Schema Validation               |
-| React Icons             | Latest  | Icon Library                    |
-| Framer Motion           | Latest  | Animation Library               |
-| React Hook Form         | Latest  | Form Handling & Validation      |
-| PostgreSQL              | -       | Database                        |
+| Tech            | Version | Purpose                         |
+| --------------- | ------- | ------------------------------- |
+| Next.js         | 15.4.2  | Fullstack React Framework       |
+| React           | 19.1.0  | UI Library                      |
+| TypeScript      | 5.x     | Type Safety & DX                |
+| TailwindCSS     | 4.1.11  | Styling Framework               |
+| Shadcn/UI       | Latest  | Pre-built Accessible Components |
+| NextAuth        | 5.0.0   | Authentication System           |
+| Prisma          | 6.12.0  | Database ORM                    |
+| Zod             | 4.0.5   | Schema Validation               |
+| React Icons     | Latest  | Icon Library                    |
+| Framer Motion   | Latest  | Animation Library               |
+| React Hook Form | Latest  | Form Handling & Validation      |
+| BCrypt          | 6.0.0   | Password Hashing                |
+| Nodemailer      | 6.10.1  | Email Service                   |
+| PostgreSQL      | -       | Database                        |
 
 ---
 
@@ -51,7 +54,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your database and Supabase credentials
+# Edit .env with your database credentials and email service
 
 # Set up the database
 npx prisma generate
@@ -65,16 +68,18 @@ Open [http://localhost:3000](http://localhost:3000) to see your app running.
 
 ### 🔐 Authentication Setup
 
-1. Create a [Supabase](https://supabase.com) project
-2. Get your project URL and anon key from the Supabase dashboard
-3. Add them to your `.env` file
-4. **Run the SQL commands** from the "Database Schema" section in your Supabase SQL Editor
+1. Set up your PostgreSQL database
+2. Configure your email service (SMTP or email provider)
+3. Add the required environment variables to your `.env` file
+4. Run `npx prisma db push` to create the database tables
 5. The authentication system is ready to use with:
-   - `/login` - Login page
-   - `/signup` - Registration page  
-   - `/dashboard` - Protected dashboard (requires authentication)
-   - Automatic redirects for authenticated/unauthenticated users
-   - Automatic profile creation for new users
+    - `/login` - Login page
+    - `/signup` - Registration page
+    - `/verify` - Email verification page
+    - `/dashboard` - Protected dashboard (requires authentication)
+    - Automatic redirects for authenticated/unauthenticated users
+    - Secure password hashing with bcrypt
+    - Email verification tokens for account security
 
 ---
 
@@ -86,9 +91,13 @@ Create a `.env` file with the following variables:
 # Database
 DATABASE_URL="your-postgresql-connection-string"
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL="your-supabase-project-url"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+# NextAuth
+NEXTAUTH_SECRET="your-nextauth-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Email Service (for verification emails)
+MAIL_USER="your-email@example.com"
+MAIL_PASS="your-email-password"
 ```
 
 ---
@@ -101,7 +110,10 @@ hack-pack/
 │   ├── app/                    # Next.js App Router
 │   │   ├── (auth)/             # Authentication pages
 │   │   │   ├── login/          # Login page
-│   │   │   └── signup/         # Signup page
+│   │   │   ├── signup/         # Signup page
+│   │   │   └── verify/         # Email verification page
+│   │   ├── api/                # API routes
+│   │   │   └── auth/           # NextAuth API routes
 │   │   ├── dashboard/          # Protected dashboard page
 │   │   ├── globals.css         # Global styles with Tailwind
 │   │   ├── layout.tsx          # Root layout
@@ -112,11 +124,13 @@ hack-pack/
 │   │   └── useAuth.ts          # Authentication hook
 │   ├── lib/                    # Server-side utilities
 │   │   ├── action.ts           # Server actions
+│   │   ├── email.ts            # Email service utilities
 │   │   ├── prisma.ts           # Prisma client setup
 │   │   ├── prisma-db.ts        # Database operations
-│   │   ├── supabase.ts         # Supabase client setup
-│   │   └── utils.ts            # Utility functions (cn helper)
+│   │   ├── utils.ts            # Utility functions (cn helper)
+│   │   └── zod.ts              # Zod schemas for validation
 │   ├── utils/                  # Client-side utilities
+│   ├── auth.ts                 # NextAuth configuration
 │   ├── middleware.ts           # Route protection middleware
 │   └── generated/              # Prisma generated files
 ├── prisma/
@@ -129,44 +143,49 @@ hack-pack/
 
 ## 🗄️ Database Schema
 
-The included Prisma schema has a profile model designed to work with Supabase Auth:
+The included Prisma schema has User and Profile models with email verification:
 
 ```prisma
-model profile {
-  id        String @id @default(cuid())
-  fullname  String?
-  avatarurl String?
+model User {
+  id                 String              @id @default(cuid())
+  userName           String              @unique
+  email              String              @unique
+  password           String
+  isVerified         Boolean             @default(false)
+  profile            Profile?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  verificationTokens VerificationToken[]
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  fullName  String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  token   String   @unique
+  expires DateTime
+  userId  String
+  user    User     @relation(fields: [userId], references: [id])
 }
 ```
 
-### 🔄 Supabase Database Setup
+**Features:**
 
-To automatically create user profiles when users sign up, run these SQL commands in your Supabase SQL Editor:
-
-```sql
--- Create function to handle new user registration
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profile (id, fullname)
-  values (
-    new.id,
-    new.raw_user_meta_data->>'full_name'
-  );
-  return new;
-end;
-$$ language plpgsql security definer;
-
--- Create trigger to automatically call the function
-create trigger on_auth_user_created
-after insert on auth.users
-for each row
-execute procedure public.handle_new_user();
-```
-
-This setup ensures that every time a user signs up through Supabase Auth, a corresponding profile record is automatically created.
+-   **User authentication** with secure password hashing
+-   **Email verification** system with expiring tokens
+-   **User profiles** with customizable information
+-   **Automatic timestamps** for user tracking
 
 **Prisma Commands:**
+
 ```bash
 npx prisma generate    # Generate Prisma client
 npx prisma db push     # Push schema to database
@@ -178,16 +197,18 @@ npx prisma studio      # Open Prisma Studio
 ## 🎨 Styling
 
 **TailwindCSS v4** with:
-- Custom color variables for theming
-- Dark mode support (enabled by default)
-- Shadcn/UI component library
-- CSS animations with `tw-animate-css`
+
+-   Custom color variables for theming
+-   Dark mode support (enabled by default)
+-   Shadcn/UI component library
+-   CSS animations with `tw-animate-css`
 
 **Framer Motion** for:
-- Smooth page transitions
-- Component animations
-- Gesture handling
-- Layout animations
+
+-   Smooth page transitions
+-   Component animations
+-   Gesture handling
+-   Layout animations
 
 ---
 
@@ -218,9 +239,9 @@ npm run lint     # Run ESLint
 
 ## 🌱 Next Steps for Your Hackathon
 
-1. **Set up Supabase triggers** - Run the SQL commands in the Database Schema section
-2. **Design your database schema** in `prisma/schema.prisma` (extend the profile model as needed)
-3. **Customize authentication flow** - pages are ready in `src/app/(auth)/`
+1. **Configure your email service** - Set up SMTP or email provider credentials in `.env`
+2. **Customize your database schema** in `prisma/schema.prisma` (extend the User/Profile models as needed)
+3. **Design your authentication flow** - pages are ready in `src/app/(auth)/`
 4. **Build protected features** in `src/app/dashboard/` or create new protected routes
 5. **Create your UI components** in `src/components/`
 6. **Add server actions** in `src/lib/action.ts`
@@ -233,26 +254,28 @@ npm run lint     # Run ESLint
 
 ## 🔐 Authentication Features
 
-- **Supabase Auth** integration with email/password
-- **Route protection** via middleware - unauthenticated users are redirected to login
-- **Custom `useAuth` hook** for managing authentication state
-- **Form validation** with React Hook Form and Zod (email validation only, passwords handled separately)
-- **Automatic redirects** - logged-in users can't access login/signup pages
-- **Clean, modern UI** with dark theme authentication forms
+-   **NextAuth v5** integration with credentials provider
+-   **Email verification** system with secure tokens and expiration
+-   **Password hashing** with bcrypt for security
+-   **Route protection** via middleware - unauthenticated users are redirected to login
+-   **Custom `useAuth` hook** for managing authentication state
+-   **Form validation** with React Hook Form and Zod
+-   **Automatic redirects** - logged-in users can't access login/signup pages
+-   **JWT session management** with NextAuth
 
 ---
 
 ## 🧠 Hackathon Tips
 
-- Use server actions for form handling and database operations
-- Keep components modular and reusable
-- Use the `cn()` utility for conditional styling
-- Take advantage of TypeScript for better development experience
-- Add subtle animations with Framer Motion to make your app feel polished
-- **Authentication is pre-built** - focus on your core features
-- Use the `useAuth` hook to get user data and authentication state
-- Protected routes are handled automatically by middleware
-- Customize the dashboard page in `src/app/dashboard/page.tsx`
+-   Use server actions for form handling and database operations
+-   Keep components modular and reusable
+-   Use the `cn()` utility for conditional styling
+-   Take advantage of TypeScript for better development experience
+-   Add subtle animations with Framer Motion to make your app feel polished
+-   **Authentication is pre-built** - focus on your core features
+-   Use the `useAuth` hook to get user data and authentication state
+-   Protected routes are handled automatically by middleware
+-   Customize the dashboard page in `src/app/dashboard/page.tsx`
 
 ---
 

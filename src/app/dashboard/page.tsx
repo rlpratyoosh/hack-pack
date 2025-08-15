@@ -2,16 +2,15 @@
 import { useAuth } from "@/hooks/useAuth";
 
 export default function DashboardPage() {
-    // const {user, loading, signOut} = useAuth();
+    const {user, loading, signUserOut} = useAuth();
 
-    const user = {id: "23",  email: "test@gmail.com"}
-    const loading = false;
 
     if(user) {
         return (
             <div>
-                <h1>Welcome to your Dashboard, {user.email}</h1>
-                <button>Sign Out</button>
+                <h1>Welcome to your Dashboard, {user.name}</h1>
+                <p>Email: {user.email}</p>
+                <button onClick={signUserOut} className="px-1 py-2 border-2 rounded-xl bg-card">Sign Out</button>
             </div>
         );
     }
